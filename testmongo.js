@@ -1,6 +1,9 @@
 const { MongoClient } = require("mongodb");
 
 // The uri string must be the connection string for the database (obtained on Atlas).
+// From MongoDB Database Page --> Connect --> Connect your application --> Copy the connection string
+// Change <password> to the password that you set for your user
+// Make sure that under "Network Access", the database is accessible from anywhere (for class).
 const uri = "mongodb+srv://joelwhite:ypZgVswk8mhdKbmk@cluster0.a5otfso.mongodb.net/?retryWrites=true&w=majority";
 
 // --- This is the standard stuff to get it to work on the browser
@@ -35,6 +38,9 @@ console.log("Looking for: " + searchKey);
 
 async function run() {
   try {
+    // From MongoDB Database Page --> Browse Collections --> Collections tab
+    // client.db has the database.collection underneath it (in green font).
+    // Make sure the client.db name is the same as your project's database name
     const database = client.db('Cluster0');
     const parts = database.collection('MyDB');
 
