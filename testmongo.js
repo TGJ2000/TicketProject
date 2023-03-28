@@ -6,7 +6,9 @@ const { MongoClient } = require("mongodb");
 // Make sure that under "Network Access", the database is accessible from anywhere (for class).
 const uri = "mongodb+srv://joelwhite:ypZgVswk8mhdKbmk@cluster0.a5otfso.mongodb.net/?retryWrites=true&w=majority";
 
-// --- This is the standard stuff to get it to work on the browser
+// This is the standard stuff to get it to work on the browser
+// When using render, use the blue link at the top of your web-service page. Ex. https://mongorender-t4qw.onrender.com
+// Remember to suspend your web service when you aren't using it
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -25,12 +27,15 @@ app.get('/', function(req, res) {
   res.send(outstring);
 });
 
+// can help test if the app is running
 app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
 
-// Route to access database:
+// Route to access database
+// This is used to display an item with a provided part number.
+// Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
 app.get('/api/mongo/:item', function(req, res) {
 const client = new MongoClient(uri);
 const searchKey = "{ partID: '" + req.params.item + "' }";
