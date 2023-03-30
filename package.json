@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "JWs Express Mongo Test on Render",
   "main": "testmongo.js",
-  "repository": "https://github.com/jwselu/MongoTest",
+  "repository": "https://github.com/jwselu/MongoRender",
   "author": "JW",
   "license": "MIT",
   "private": false,
