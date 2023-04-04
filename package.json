@@ -1,14 +1,14 @@
 {
-  "name": "jwMongoTest",
+  "name": "jwTicketSystem",
   "version": "1.0.0",
-  "description": "JWs Express Mongo Test on Render",
-  "main": "testmongo.js",
-  "repository": "https://github.com/jwselu/MongoRender",
+  "description": "JWs Ticket System on Render",
+  "main": "ticketsystem.js",
+  "repository": "https://github.com/jwselu/TicketProject",
   "author": "JW",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "node testmongo.js"
+    "start": "node ticketsystem.js"
   },
   "dependencies": {
     "express": "^4.18.2",
