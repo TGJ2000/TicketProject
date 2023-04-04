@@ -37,7 +37,7 @@ app.get('/say/:name', function(req, res) {
 // Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
 app.get('/api/mongo/:item', function(req, res) {
 const client = new MongoClient(uri);
-const searchKey = "{id: '" + req.params.item + "' }";
+const searchKey = "{_id: '" + req.params.item + "' }";
 console.log("Looking for: " + searchKey);
 
 async function run() {
@@ -51,7 +51,7 @@ async function run() {
     // Hardwired Query for a part that has partID '12345'
     // const query = { partID: '12345' };
     // But we will use the parameter provided with the route
-    const query = { id: req.params.item };
+    const query = { _id: req.params.item };
 
     const part = await parts.findOne(query);
     console.log(part);
