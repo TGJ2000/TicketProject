@@ -33,11 +33,11 @@ app.get('/say/:name', function(req, res) {
 });
 
 // Route to access database
-// This is used to display an item with a provided type.
+// This is used to display an item with a provided id.
 // Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
 app.get('/api/mongo/:item', function(req, res) {
 const client = new MongoClient(uri);
-const searchKey = "{type: '" + req.params.item + "' }";
+const searchKey = "{id: '" + req.params.item + "' }";
 console.log("Looking for: " + searchKey);
 
 async function run() {
@@ -51,7 +51,7 @@ async function run() {
     // Hardwired Query for a part that has partID '12345'
     // const query = { partID: '12345' };
     // But we will use the parameter provided with the route
-    const query = { type: req.params.item };
+    const query = { id: req.params.item };
 
     const part = await parts.findOne(query);
     console.log(part);
