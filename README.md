@@ -1,2 +1,2 @@
-# MongoRender
-Code for testing Mongo DB
+# Ticket Project
+CMPS 415 - Enterprise Systems Ticket System Project
