@@ -43,11 +43,17 @@ async function run() {
     const database = client.db('Cluster0');
     const parts = database.collection('MyDB');
 
-    const part = await parts.find();
-    console.log(part);
-    res.send('Found this: ' + JSON.stringify(part));  //Use stringify to print a json
+    // const part = await parts.find();
+    // console.log(part);
+    
+    parts.find({}).toArray(function (err, result) {
+        if (err) {
+            res.send(err);
+        } else {
 
-  } finally {
+            res.send(JSON.stringify(result));
+        }
+    }) finally {
     // Ensures that the client will close when you finish/error
     await client.close();
   }
