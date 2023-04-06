@@ -32,10 +32,8 @@ app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
-app.get('/rest/ticket/', function(req, res) {
+app.get('/rest/list/', function(req, res) {
 const client = new MongoClient(uri);
-const searchKey = "{id: '" + req.params.theId + "' }";
-console.log("Looking for: " + searchKey);
 
 async function run() {
   try {
@@ -45,12 +43,7 @@ async function run() {
     const database = client.db('Cluster0');
     const parts = database.collection('MyDB');
 
-    // Hardwired Query for a part that has partID '12345'
-    // const query = { partID: '12345' };
-    // But we will use the parameter provided with the route
-    const query = { partID: req.params.item };
-
-    const part = await parts.findOne(query);
+    const part = await parts.find();
     console.log(part);
     res.send('Found this: ' + JSON.stringify(part));  //Use stringify to print a json
 
