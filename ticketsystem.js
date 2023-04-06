@@ -32,9 +32,9 @@ app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
-app.get('/api/mongo/id/:id', function(req, res) {
+app.get('/api/mongo/id/:theId', function(req, res) {
 const client = new MongoClient(uri);
-const searchKey = "{id: '" + req.params.id + "' }";
+const searchKey = "{id: '" + req.params.theId + "' }";
 console.log("Looking for: " + searchKey);
 
 // Route to access database
