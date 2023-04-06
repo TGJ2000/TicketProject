@@ -1,4 +1,4 @@
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 // The uri string must be the connection string for the database (obtained on Atlas).
 // From MongoDB Database Page --> Connect --> Connect your application --> Copy the connection string
