@@ -87,6 +87,72 @@ run().catch(console.dir);
 
 
 
+
+app.use(express.json());
+
+app.post('/rest/ticket/', function(req, res) {
+  // Create a new MongoClient instance and connect to the MongoDB cluster
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  client.connect(async function(err) {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error connecting to database');
+      return;
+    }
+
+    try {
+      const database = client.db('Cluster0');
+      const collection = database.collection('MyDB');
+
+      // Extract the fields from the request body
+      const {
+        created_at,
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+        follower_ids,
+        tags
+      } = req.body;
+
+      // Insert a new document with the specified fields
+      const result = await collection.insertOne({
+        _id: new ObjectId(),
+        created_at,
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+        follower_ids: [],
+        tags: []
+      });
+
+      // Return the newly created document
+      const newDocument = await collection.findOne({_id: result.insertedId});
+      res.json(newDocument);
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error creating ticket');
+    } finally {
+      await client.close();
+    }
+  });
+
+
+
+/*
+
 const client = new MongoClient(uri);
 app.post('/rest/ticket/', function(req, res) {
   // Extract the fields from the request body
@@ -139,7 +205,7 @@ app.post('/rest/ticket/', function(req, res) {
   run().catch(console.dir);
 });
 
-
+*/
 
 
 
