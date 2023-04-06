@@ -37,6 +37,31 @@ const client = new MongoClient(uri);
 const searchKey = "{id: '" + req.params.theId + "' }";
 console.log("Looking for: " + searchKey);
 
+async function run() {
+  try {
+    // From MongoDB Database Page --> Browse Collections --> Collections tab
+    // client.db has the database.collection underneath it (in green font).
+    // Make sure the client.db name is the same as your project's database name
+    const database = client.db('Cluster0');
+    const parts = database.collection('MyDB');
+
+    // Hardwired Query for a part that has partID '12345'
+    // const query = { partID: '12345' };
+    // But we will use the parameter provided with the route
+    const query = { partID: req.params.item };
+
+    const part = await parts.findOne(query);
+    console.log(part);
+    res.send('Found this: ' + JSON.stringify(part));  //Use stringify to print a json
+
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+});
+
 // Route to access database
 // This is used to display an item with a provided part number.
 // Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
