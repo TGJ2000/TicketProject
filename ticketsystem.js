@@ -81,6 +81,68 @@ run().catch(console.dir);
 });
 
 
+
+
+
+
+
+
+
+app.post('/rest/ticket/', function(req, res) {
+  // Extract the fields from the request body
+  const {
+    created_at,
+    updated_at,
+    type,
+    subject,
+    description,
+    priority,
+    status,
+    recipient,
+    submitter,
+    assignee_id,
+    follower_ids,
+    tags
+  } = req.body;
+
+  async function run() {
+    try {
+      const database = client.db('Cluster0');
+      const collection = database.collection('MyDB');
+
+      // Insert a new document with the specified fields
+      const result = await collection.insertOne({
+        _id: new ObjectId(),
+        created_at,
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+        follower_ids: [],
+        tags: []
+      });
+
+      // Return the newly created document
+      const newDocument = await collection.findOne({_id: result.insertedId});
+      res.json(newDocument);
+
+    } finally {
+      await client.close();
+    }
+  }
+
+  run().catch(console.dir);
+});
+
+
+
+
+
 // Route to access database
 // This is used to display an item with a provided part number.
 // Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
