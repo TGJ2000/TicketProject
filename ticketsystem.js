@@ -32,7 +32,7 @@ app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
-app.get('/api/mongo/id/:theId', function(req, res) {
+app.get('/rest/ticket/:theId', function(req, res) {
 const client = new MongoClient(uri);
 const searchKey = "{id: '" + req.params.theId + "' }";
 console.log("Looking for: " + searchKey);
