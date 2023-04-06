@@ -32,34 +32,22 @@ app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
+
+//List all tickets in database
 app.get('/rest/list/', function(req, res) {
-const client = new MongoClient(uri);
+  const client = new MongoClient(uri);
 
-async function run() {
-  try {
-    // From MongoDB Database Page --> Browse Collections --> Collections tab
-    // client.db has the database.collection underneath it (in green font).
-    // Make sure the client.db name is the same as your project's database name
-    const database = client.db('Cluster0');
-    const parts = database.collection('MyDB');
-
-    // const part = await parts.find();
-    // console.log(part);
-    
-    parts.find({}).toArray(function (err, result) {
-        if (err) {
-            res.send(err);
-        } else {
-
-            res.send(JSON.stringify(result));
-        }
-    }) }
-  finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+  async function run() {
+    try {
+      const database = client.db('Cluster0');
+      const parts = database.collection('MyDB');
+      const cursor = parts.find({});
+      res.send(await cursor.toArray());
+    } finally {
+      await client.close();
+    }
   }
-}
-run().catch(console.dir);
+  run().catch(console.dir);
 });
 
 
