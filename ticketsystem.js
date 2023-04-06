@@ -83,23 +83,12 @@ run().catch(console.dir);
 
 
 
-
-
-
-
-
 app.use(express.json());
-
 app.post('/rest/ticket/', function(req, res) {
   // Create a new MongoClient instance and connect to the MongoDB cluster
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-  client.connect(async function(err) {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error connecting to database');
-      return;
-    }
-
+  
+async function run() {
     try {
       const database = client.db('Cluster0');
       const collection = database.collection('MyDB');
@@ -141,103 +130,9 @@ app.post('/rest/ticket/', function(req, res) {
       const newDocument = await collection.findOne({_id: result.insertedId});
       res.json(newDocument);
 
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Error creating ticket');
     } finally {
       await client.close();
-    }
-  });
-
-
-
-/*
-
-const client = new MongoClient(uri);
-app.post('/rest/ticket/', function(req, res) {
-  // Extract the fields from the request body
-  const {
-    created_at,
-    updated_at,
-    type,
-    subject,
-    description,
-    priority,
-    status,
-    recipient,
-    submitter,
-    assignee_id,
-    follower_ids,
-    tags
-  } = req.body;
-
-  async function run() {
-    try {
-      const database = client.db('Cluster0');
-      const collection = database.collection('MyDB');
-
-      // Insert a new document with the specified fields
-      const result = await collection.insertOne({
-        _id: new ObjectId(),
-        created_at,
-        updated_at,
-        type,
-        subject,
-        description,
-        priority,
-        status,
-        recipient,
-        submitter,
-        assignee_id,
-        follower_ids: [],
-        tags: []
-      });
-
-      // Return the newly created document
-      const newDocument = await collection.findOne({_id: result.insertedId});
-      res.json(newDocument);
-
-    } finally {
-      await client.close();
-    }
-  }
-
-  run().catch(console.dir);
-});
-
-*/
-
-
-
-// Route to access database
-// This is used to display an item with a provided part number.
-// Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
-app.get('/api/mongo/:item', function(req, res) {
-const client = new MongoClient(uri);
-const searchKey = "{ partID: '" + req.params.item + "' }";
-console.log("Looking for: " + searchKey);
-
-async function run() {
-  try {
-    // From MongoDB Database Page --> Browse Collections --> Collections tab
-    // client.db has the database.collection underneath it (in green font).
-    // Make sure the client.db name is the same as your project's database name
-    const database = client.db('Cluster0');
-    const parts = database.collection('MyDB');
-
-    // Hardwired Query for a part that has partID '12345'
-    // const query = { partID: '12345' };
-    // But we will use the parameter provided with the route
-    const query = { partID: req.params.item };
-
-    const part = await parts.findOne(query);
-    console.log(part);
-    res.send('Found this: ' + JSON.stringify(part));  //Use stringify to print a json
-
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
+ }
 }
 run().catch(console.dir);
 });
