@@ -87,7 +87,7 @@ run().catch(console.dir);
 
 
 
-
+const client = new MongoClient(uri);
 app.post('/rest/ticket/', function(req, res) {
   // Extract the fields from the request body
   const {
