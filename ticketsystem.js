@@ -32,6 +32,11 @@ app.get('/say/:name', function(req, res) {
   res.send('Hello ' + req.params.name + '!');
 });
 
+app.get('/api/mongo/id/:id', function(req, res) {
+const client = new MongoClient(uri);
+const searchKey = "{id: '" + req.params.id + "' }";
+console.log("Looking for: " + searchKey);
+
 // Route to access database
 // This is used to display an item with a provided part number.
 // Ex. https://mongorender-t4qw.onrender.com/api/mongo/12345
