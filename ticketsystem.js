@@ -53,7 +53,7 @@ app.get('/rest/list/', function(req, res) {
 
 app.get('/rest/ticket/:theId', function(req, res) {
 const client = new MongoClient(uri);
-const searchKey = "{id: '" + req.params.theId + "' }";
+const searchKey = {_id: new ObjectId(req.params.theId)};
 console.log("Looking for: " + searchKey);
 
 async function run() {
