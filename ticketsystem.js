@@ -13,6 +13,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 app.listen(port);
+app.use(express.json());
 console.log('Server started at http://localhost:' + port);
 
 app.use(express.json());
@@ -82,8 +83,6 @@ run().catch(console.dir);
 
 
 
-
-app.use(express.json());
 app.post('/rest/ticket/', function(req, res) {
   // Create a new MongoClient instance and connect to the MongoDB cluster
   const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -135,4 +134,103 @@ async function run() {
  }
 }
 run().catch(console.dir);
+});
+
+
+
+app.put('/rest/ticket/:id', async (req, res) => {
+  // Create a new MongoClient instance and connect to the MongoDB cluster
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    await client.connect();
+
+    const database = client.db('Cluster0');
+    const collection = database.collection('MyDB');
+
+    const ticketId = req.params.id;
+
+    // Extract the fields from the request body
+    const {
+      created_at,
+      updated_at,
+      type,
+      subject,
+      description,
+      priority,
+      status,
+      recipient,
+      submitter,
+      assignee_id,
+      follower_ids,
+      tags
+    } = req.body;
+
+    // Create the update object based on the fields provided
+    const updateObject = {
+      $set: {
+        created_at,
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+        follower_ids,
+        tags
+      }
+    };
+
+    // Update the ticket document with the specified fields
+    const result = await collection.updateOne({ _id: ObjectId(ticketId) }, updateObject);
+
+    // Check if the update was successful
+    if (result.matchedCount === 0) {
+      res.status(404).json({ message: 'Ticket not found' });
+    } else {
+      // Return the updated document
+      const updatedDocument = await collection.findOne({_id: ObjectId(ticketId)});
+      res.json(updatedDocument);
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await client.close();
+  }
+});
+
+
+app.delete('/rest/ticket/:id', async (req, res) => {
+  // Create a new MongoClient instance and connect to the MongoDB cluster
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try {
+    await client.connect();
+
+    const database = client.db('Cluster0');
+    const collection = database.collection('MyDB');
+
+    const ticketId = req.params.id;
+
+    // Delete the ticket document with the specified ID
+    const result = await collection.deleteOne({ _id: ObjectId(ticketId) });
+
+    // Check if the deletion was successful
+    if (result.deletedCount === 0) {
+      res.status(404).json({ message: 'Ticket not found' });
+    } else {
+      res.json({ message: 'Ticket deleted' });
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await client.close();
+  }
 });
