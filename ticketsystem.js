@@ -246,6 +246,7 @@ app.get('/create-ticket', function(req, res) {
       <input type="text" id="follower_ids" name="follower_ids"><br>
       <label for="tags">Tags:</label>
       <input type="text" id="tags" name="tags"><br>
+      <input type="hidden" id="created_at" name="created_at" value="${new Date().toISOString()}">
       <button type="submit">Submit</button>
     </form>
   `);
