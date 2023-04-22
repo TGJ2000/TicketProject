@@ -212,3 +212,41 @@ app.delete('/rest/ticket/:theId', function(req, res) {
   }
   run().catch(console.dir);
 });
+
+
+// Default route - display form
+app.get('/', function(req, res) {
+  res.send(`
+    <form action="/rest/ticket" method="POST">
+      <label for="type">Type:</label>
+      <input type="text" id="type" name="type" required><br>
+      <label for="subject">Subject:</label>
+      <input type="text" id="subject" name="subject" required><br>
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" required></textarea><br>
+      <label for="priority">Priority:</label>
+      <select id="priority" name="priority" required>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select><br>
+      <label for="status">Status:</label>
+      <select id="status" name="status" required>
+        <option value="open">Open</option>
+        <option value="in progress">In Progress</option>
+        <option value="closed">Closed</option>
+      </select><br>
+      <label for="recipient">Recipient:</label>
+      <input type="text" id="recipient" name="recipient" required><br>
+      <label for="submitter">Submitter:</label>
+      <input type="text" id="submitter" name="submitter" required><br>
+      <label for="assignee_id">Assignee ID:</label>
+      <input type="text" id="assignee_id" name="assignee_id"><br>
+      <label for="follower_ids">Follower IDs:</label>
+      <input type="text" id="follower_ids" name="follower_ids"><br>
+      <label for="tags">Tags:</label>
+      <input type="text" id="tags" name="tags"><br>
+      <button type="submit">Submit</button>
+    </form>
+  `);
+});
