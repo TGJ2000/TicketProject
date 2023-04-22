@@ -215,7 +215,7 @@ app.delete('/rest/ticket/:theId', function(req, res) {
 
 
 // Default route - display form
-app.get('/', function(req, res) {
+app.get('/create-ticket', function(req, res) {
   res.send(`
     <form action="/rest/ticket" method="POST">
       <label for="type">Type:</label>
