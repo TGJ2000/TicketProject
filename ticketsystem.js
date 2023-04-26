@@ -283,8 +283,6 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
 // Endpoint to add a single ticket that was sent as an XML document
 app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
-  const searchKey = { _id: new ObjectId(req.params.theId) };
-  console.log("Updating: " + searchKey);
 
   // Convert the XML request body to a JSON object
   const parser = new xml2js.Parser({explicitArray: false});
@@ -295,10 +293,10 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
           const database = client.db('Cluster0');
           const parts = database.collection('MyDB');
 
-          // Use the existing /rest/ticket/:theId endpoint to add the ticket information
-          const result = await parts.updateOne(searchKey, {$set: json}, {upsert: true});
+          // Insert the ticket information into the parts collection
+          const result = await parts.insertOne(json);
           console.log(result);
-          res.send('Updated ' + result.modifiedCount + ' document(s)');
+          res.send('Created ' + result.insertedCount + ' new document(s)');
 
         } finally {
           await client.close();
