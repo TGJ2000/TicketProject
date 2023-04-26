@@ -1,4 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
+const xml2js = require('xml2js');
 
 // The uri string must be the connection string for the database (obtained on Atlas).
 // From MongoDB Database Page --> Connect --> Connect your application --> Copy the connection string
@@ -250,4 +251,63 @@ app.get('/create-ticket', function(req, res) {
       <button type="submit">Submit</button>
     </form>
   `);
+});
+
+// Endpoint to get a single ticket returned as an XML document
+app.get('/rest/xml/ticket/:theId', function(req, res) {
+  const client = new MongoClient(uri);
+  const searchKey = { _id: new ObjectId(req.params.theId) };
+  console.log("Looking for: " + searchKey);
+
+  async function run() {
+    try {
+      const database = client.db('Cluster0');
+      const parts = database.collection('MyDB');
+
+      // Use the existing /rest/ticket/:theId endpoint to get the ticket information
+      const response = await parts.findOne(searchKey);
+
+      // Convert the JSON response to an XML document
+      const builder = new xml2js.Builder({rootName: 'ticket'});
+      const xml = builder.buildObject(response);
+
+      // Send the XML document as the response
+      res.type('application/xml').send(xml);
+    } finally {
+      await client.close();
+    }
+  }
+  run().catch(console.dir);
+});
+
+// Endpoint to add a single ticket that was sent as an XML document
+app.put('/rest/xml/ticket/:theId', function(req, res) {
+  const client = new MongoClient(uri);
+  const searchKey = { _id: new ObjectId(req.params.theId) };
+  console.log("Updating: " + searchKey);
+
+  // Convert the XML request body to a JSON object
+  const parser = new xml2js.Parser({explicitArray: false});
+  parser.parseStringPromise(req.body)
+    .then(async function(json) {
+      async function run() {
+        try {
+          const database = client.db('Cluster0');
+          const parts = database.collection('MyDB');
+
+          // Use the existing /rest/ticket/:theId endpoint to add the ticket information
+          const result = await parts.updateOne(searchKey, {$set: json}, {upsert: true});
+          console.log(result);
+          res.send('Updated ' + result.modifiedCount + ' document(s)');
+
+        } finally {
+          await client.close();
+        }
+      }
+      run().catch(console.dir);
+    })
+    .catch(function(err) {
+      console.log(err);
+      res.status(400).send('Bad Request');
+    });
 });
