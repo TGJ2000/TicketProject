@@ -2,10 +2,10 @@
 CMPS 415 - Enterprise Systems Ticket System Project
 
 # Routes:
-Post
+Post <br/>
 /rest/ticket/	//Create a new ticket in the database
 
-Get
+Get <br/>
 / 		//default route
 /say/:name 	//Checks if app is running
 /rest/list/ 		//List all tickets in database
