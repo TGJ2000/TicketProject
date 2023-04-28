@@ -253,8 +253,11 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
       const parts = database.collection('MyDB');
 
       // Use the existing /rest/ticket/:theId endpoint to get the ticket information
-      const response = await parts.findOne(searchKey);
-
+      const response = await parts.findOne(query);
+      
+      const query = { _id: new ObjectId(req.params.theId) };
+      console.log(part);
+      
       // Convert the JSON response to an XML document
       const builder = new xml2js.Builder({rootName: 'ticket'});
       const xml = builder.buildObject(response);
