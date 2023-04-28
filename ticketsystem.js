@@ -268,60 +268,64 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
   run().catch(console.dir);
 });
 
+// Add a single ticket sent as an XML document
 app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
   const searchKey = { _id: new ObjectId(req.params.theId) };
   console.log("Updating: " + searchKey);
 
-  // Log the XML request body
-  console.log("Request body:", req.body);
+  const parser = new xml2js.Parser();
 
-  // Convert the XML request body to a JSON object
-  const parser = new xml2js.Parser({explicitArray: false});
-  parser.parseStringPromise(req.body)
-    .then(async function(json) {
+  // Convert XML document to JSON object
+  parser.parseString(req.body, function (err, result) {
+    if (err) {
+      console.error(err);
+      res.status(400).send('Error parsing XML document');
+      return;
+    }
+
+    const ticket = result.ticket;
+    console.log(ticket);
+
     async function run() {
-        try {
-          const database = client.db('Cluster0');
-          const parts = database.collection('MyDB');
-                // Extract the fields to update from the request body
-      const {
-        updated_at,
-        type,
-        subject,
-        description,
-        priority,
-        status,
-        recipient,
-        submitter,
-        assignee_id,
-      } = req.body;
+      try {
+        const database = client.db('Cluster0');
+        const parts = database.collection('MyDB');
 
-      // Set the fields to update
-      const updateFields = {};
-      if (updated_at) updateFields.updated_at = updated_at;
-      if (type) updateFields.type = type;
-      if (subject) updateFields.subject = subject;
-      if (description) updateFields.description = description;
-      if (priority) updateFields.priority = priority;
-      if (status) updateFields.status = status;
-      if (recipient) updateFields.recipient = recipient;
-      if (submitter) updateFields.submitter = submitter;
-      if (assignee_id) updateFields.assignee_id = assignee_id;
+        // Extract the fields to update from the JSON object
+        const {
+          updated_at,
+          type,
+          subject,
+          description,
+          priority,
+          status,
+          recipient,
+          submitter,
+          assignee_id,
+        } = ticket;
 
-          // Use the existing /rest/ticket/:theId endpoint to add the ticket information
-          const result = await parts.updateOne(searchKey, {$set: json}, {upsert: true});
-          console.log(result);
-          res.send('Updated ' + result.modifiedCount + ' document(s)');
+        // Set the fields to update
+        const updateFields = {};
+        if (updated_at) updateFields.updated_at = updated_at;
+        if (type) updateFields.type = type;
+        if (subject) updateFields.subject = subject;
+        if (description) updateFields.description = description;
+        if (priority) updateFields.priority = priority;
+        if (status) updateFields.status = status;
+        if (recipient) updateFields.recipient = recipient;
+        if (submitter) updateFields.submitter = submitter;
+        if (assignee_id) updateFields.assignee_id = assignee_id;
 
-        } finally {
-          await client.close();
-        }
+        // Update the document with the specified fields
+        const result = await parts.updateOne(searchKey, { $set: updateFields });
+        console.log(result);
+        res.send('Updated ' + result.modifiedCount + ' document(s)');
+
+      } finally {
+        await client.close();
       }
-      run().catch(console.dir);
-    })
-    .catch(function(err) {
-      console.log(err);
-      res.status(400).send('Bad Request');
-    });
+    }
+    run().catch(console.dir);
+  });
 });
