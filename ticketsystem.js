@@ -348,19 +348,18 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   run().catch(console.dir);
 });
 
-
-// Add a single ticket that was sent as an XML document
+// Update a single ticket that was sent as an XML document
 app.put('/rest/xml/ticket/:theId', function(req, res) {
 const client = new MongoClient(uri);
 const searchKey = { _id: new ObjectId(req.params.theId) };
-console.log("Adding: " + searchKey);
+console.log("Updating: " + searchKey);
 
 async function run() {
 try {
 const database = client.db('Cluster0');
 const parts = database.collection('MyDB');
-
-  // Parse the XML document to a JSON object
+  
+  // Parse the XML request body into a JSON object
   const {
     updated_at,
     type,
@@ -372,25 +371,22 @@ const parts = database.collection('MyDB');
     submitter,
     assignee_id,
   } = req.body.ticket;
-
-  // Set the fields for the new ticket
-  const newTicket = {
-    _id: searchKey._id,
-    updated_at: updated_at,
-    type: type,
-    subject: subject,
-    description: description,
-    priority: priority,
-    status: status,
-    recipient: recipient,
-    submitter: submitter,
-    assignee_id: assignee_id,
+  const jsonBody = {
+    updated_at,
+    type,
+    subject,
+    description,
+    priority,
+    status,
+    recipient,
+    submitter,
+    assignee_id,
   };
 
-  // Add the new ticket to the database
-  const result = await parts.insertOne(newTicket);
+  // Update the ticket with the specified fields
+  const result = await parts.updateOne(searchKey, { $set: jsonBody });
   console.log(result);
-  res.send('Added ' + result.insertedCount + ' document(s)');
+  res.send('Updated ' + result.modifiedCount + ' document(s)');
 
 } finally {
   await client.close();
