@@ -282,6 +282,69 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       const database = client.db('Cluster0');
       const parts = database.collection('MyDB');
 
+      // Check if document exists
+      const existingDoc = await parts.findOne(searchKey);
+      if (!existingDoc) {
+        res.status(404).send('Document not found');
+        return;
+      }
+
+      // Convert XML request body to JSON
+      const xml = req.body;
+      const options = { compact: true, ignoreComment: true, spaces: 4 };
+      const json = convert.xml2js(xml, options);
+
+      // Extract the fields to update from the parsed JSON
+      const {
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+      } = json.root;
+
+      // Set the fields to update
+      const updateFields = {};
+      if (updated_at) updateFields.updated_at = updated_at._text;
+      if (type) updateFields.type = type._text;
+      if (subject) updateFields.subject = subject._text;
+      if (description) updateFields.description = description._text;
+      if (priority) updateFields.priority = priority._text;
+      if (status) updateFields.status = status._text;
+      if (recipient) updateFields.recipient = recipient._text;
+      if (submitter) updateFields.submitter = submitter._text;
+      if (assignee_id) updateFields.assignee_id = assignee_id._text;
+
+      // Update the document with the specified fields
+      const result = await parts.updateOne(searchKey, { $set: updateFields });
+      console.log(result);
+      res.send('Updated ' + result.modifiedCount + ' document(s)');
+
+    } catch (err) {
+      console.error(err);
+      res.status(400).send('Bad Request');
+    } finally {
+      await client.close();
+    }
+  }
+  run().catch(console.dir);
+});
+
+
+/* app.put('/rest/xml/ticket/:theId', function(req, res) {
+  const client = new MongoClient(uri);
+  const searchKey = { _id: new ObjectId(req.params.theId) };
+  console.log("Updating: " + searchKey);
+
+  async function run() {
+    try {
+      const database = client.db('Cluster0');
+      const parts = database.collection('MyDB');
+
       // Convert XML request body to JSON
       const xml = req.body;
       const options = { compact: true, ignoreComment: true, spaces: 4 };
