@@ -347,3 +347,54 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   }
   run().catch(console.dir);
 });
+
+
+// Add a single ticket that was sent as an XML document
+app.put('/rest/xml/ticket/:theId', function(req, res) {
+const client = new MongoClient(uri);
+const searchKey = { _id: new ObjectId(req.params.theId) };
+console.log("Adding: " + searchKey);
+
+async function run() {
+try {
+const database = client.db('Cluster0');
+const parts = database.collection('MyDB');
+
+  // Parse the XML document to a JSON object
+  const {
+    updated_at,
+    type,
+    subject,
+    description,
+    priority,
+    status,
+    recipient,
+    submitter,
+    assignee_id,
+  } = req.body.ticket;
+
+  // Set the fields for the new ticket
+  const newTicket = {
+    _id: searchKey._id,
+    updated_at: updated_at,
+    type: type,
+    subject: subject,
+    description: description,
+    priority: priority,
+    status: status,
+    recipient: recipient,
+    submitter: submitter,
+    assignee_id: assignee_id,
+  };
+
+  // Add the new ticket to the database
+  const result = await parts.insertOne(newTicket);
+  console.log(result);
+  res.send('Added ' + result.insertedCount + ' document(s)');
+
+} finally {
+  await client.close();
+}
+}
+run().catch(console.dir);
+});
