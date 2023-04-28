@@ -259,7 +259,7 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
       // Convert the JSON response to an XML document
       const builder = new xml2js.Builder({rootName: 'ticket'});
       const xml = builder.buildObject(response);
-
+      console.log(xml);
       // Send the XML document as the response
       res.type('application/xml').send(xml);
     } finally {
@@ -286,7 +286,8 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       const xml = req.body;
       const options = { compact: true, ignoreComment: true, spaces: 4 };
       const json = convert.xml2js(xml, options);
-
+      console.log(json);
+      
       // Extract the fields to update from the parsed JSON
       const {
         updated_at,
