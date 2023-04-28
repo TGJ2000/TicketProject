@@ -57,8 +57,6 @@ app.put('/rest/ticket/:theId', function(req, res) {
         recipient,
         submitter,
         assignee_id,
-        follower_ids,
-        tags
       } = req.body;
 
       // Set the fields to update
@@ -72,8 +70,6 @@ app.put('/rest/ticket/:theId', function(req, res) {
       if (recipient) updateFields.recipient = recipient;
       if (submitter) updateFields.submitter = submitter;
       if (assignee_id) updateFields.assignee_id = assignee_id;
-      if (follower_ids) updateFields.follower_ids = follower_ids;
-      if (tags) updateFields.tags = tags;
 
       // Update the document with the specified fields
       const result = await parts.updateOne(searchKey, { $set: updateFields });
@@ -158,8 +154,6 @@ async function run() {
         recipient,
         submitter,
         assignee_id,
-        follower_ids,
-        tags
       } = req.body;
 
       // Insert a new document with the specified fields
@@ -175,8 +169,6 @@ async function run() {
         recipient,
         submitter,
         assignee_id,
-        follower_ids: [],
-        tags: []
       });
 
       // Return the newly created document
@@ -243,10 +235,6 @@ app.get('/create-ticket', function(req, res) {
       <input type="text" id="submitter" name="submitter" required><br>
       <label for="assignee_id">Assignee ID:</label>
       <input type="text" id="assignee_id" name="assignee_id"><br>
-      <label for="follower_ids">Follower IDs:</label>
-      <input type="text" id="follower_ids" name="follower_ids"><br>
-      <label for="tags">Tags:</label>
-      <input type="text" id="tags" name="tags"><br>
       <input type="hidden" id="created_at" name="created_at" value="${new Date().toISOString()}">
       <button type="submit">Submit</button>
     </form>
@@ -305,8 +293,6 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
         recipient,
         submitter,
         assignee_id,
-        follower_ids,
-        tags
       } = req.body;
 
       // Set the fields to update
@@ -320,8 +306,6 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       if (recipient) updateFields.recipient = recipient;
       if (submitter) updateFields.submitter = submitter;
       if (assignee_id) updateFields.assignee_id = assignee_id;
-      if (follower_ids) updateFields.follower_ids = follower_ids;
-      if (tags) updateFields.tags = tags;
 
           // Use the existing /rest/ticket/:theId endpoint to add the ticket information
           const result = await parts.updateOne(searchKey, {$set: json}, {upsert: true});
