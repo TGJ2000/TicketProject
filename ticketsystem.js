@@ -267,3 +267,59 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
   }
   run().catch(console.dir);
 });
+
+//Endpoint to update a ticket using XML
+app.put('/rest/ticket/:theId', function(req, res) {
+  const client = new MongoClient(uri);
+  const searchKey = { _id: new ObjectId(req.params.theId) };
+  console.log("Updating: " + searchKey);
+
+  async function run() {
+    try {
+      const database = client.db('Cluster0');
+      const parts = database.collection('MyDB');
+
+      // Convert XML request body to JSON
+      const xml = req.body;
+      const parser = new xml2js.Parser({ explicitArray: false });
+      const json = await parser.parseStringPromise(xml);
+
+      // Extract the fields to update from the parsed JSON
+      const {
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+      } = json;
+
+      // Set the fields to update
+      const updateFields = {};
+      if (updated_at) updateFields.updated_at = updated_at;
+      if (type) updateFields.type = type;
+      if (subject) updateFields.subject = subject;
+      if (description) updateFields.description = description;
+      if (priority) updateFields.priority = priority;
+      if (status) updateFields.status = status;
+      if (recipient) updateFields.recipient = recipient;
+      if (submitter) updateFields.submitter = submitter;
+      if (assignee_id) updateFields.assignee_id = assignee_id;
+
+      // Update the document with the specified fields
+      const result = await parts.updateOne(searchKey, { $set: updateFields });
+      console.log(result);
+      res.send('Updated ' + result.modifiedCount + ' document(s)');
+
+    } catch (err) {
+      console.error(err);
+      res.status(400).send('Bad Request');
+    } finally {
+      await client.close();
+    }
+  }
+  run().catch(console.dir);
+});
