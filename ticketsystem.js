@@ -290,10 +290,38 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   const parser = new xml2js.Parser({explicitArray: false});
   parser.parseStringPromise(req.body)
     .then(async function(json) {
-      async function run() {
+    async function run() {
         try {
           const database = client.db('Cluster0');
           const parts = database.collection('MyDB');
+                // Extract the fields to update from the request body
+      const {
+        updated_at,
+        type,
+        subject,
+        description,
+        priority,
+        status,
+        recipient,
+        submitter,
+        assignee_id,
+        follower_ids,
+        tags
+      } = req.body;
+
+      // Set the fields to update
+      const updateFields = {};
+      if (updated_at) updateFields.updated_at = updated_at;
+      if (type) updateFields.type = type;
+      if (subject) updateFields.subject = subject;
+      if (description) updateFields.description = description;
+      if (priority) updateFields.priority = priority;
+      if (status) updateFields.status = status;
+      if (recipient) updateFields.recipient = recipient;
+      if (submitter) updateFields.submitter = submitter;
+      if (assignee_id) updateFields.assignee_id = assignee_id;
+      if (follower_ids) updateFields.follower_ids = follower_ids;
+      if (tags) updateFields.tags = tags;
 
           // Use the existing /rest/ticket/:theId endpoint to add the ticket information
           const result = await parts.updateOne(searchKey, {$set: json}, {upsert: true});
