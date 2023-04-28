@@ -286,7 +286,10 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       const xml = req.body;
       const options = { compact: true, ignoreComment: true, spaces: 4 };
       const json = convert.xml2js(xml, options);
-      console.log(json);
+      const xml = req.body;
+console.log('XML:', xml);
+console.log('JSON:', json);
+
       
       // Extract the fields to update from the parsed JSON
       const {
