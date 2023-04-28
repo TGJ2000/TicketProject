@@ -1,6 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const xml2js = require('xml2js');
-const xml2js = require('xml-js');
 
 
 // The uri string must be the connection string for the database (obtained on Atlas).
