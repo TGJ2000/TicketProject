@@ -21,6 +21,27 @@ console.log('Server started at http://localhost:' + port);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//Middleware to parse JSON and XML
+app.use(function(req, res, next) {
+  if (req.is('application/xml')) {
+    let xml = '';
+    req.on('data', chunk => {
+      xml += chunk;
+    });
+    req.on('end', () => {
+      xml2js.parseString(xml, (err, result) => {
+        if (err) {
+          throw err;
+        }
+        req.body = result;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});
+
 // routes will go here
 
 // Default route:
