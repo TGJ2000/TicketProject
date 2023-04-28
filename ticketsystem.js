@@ -273,7 +273,10 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
   const searchKey = { _id: new ObjectId(req.params.theId) };
   console.log("Updating: " + searchKey);
-
+  
+    // Log the XML request body
+  console.log("Request body:", req.body);
+  
   const parser = new xml2js.Parser();
 
   // Convert XML document to JSON object
@@ -327,5 +330,9 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       }
     }
     run().catch(console.dir);
-  });
+  })
+  .catch(function(err) {
+      console.log(err);
+      res.status(400).send('Bad Request');
+    });
 });
