@@ -282,13 +282,6 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
       const database = client.db('Cluster0');
       const parts = database.collection('MyDB');
 
-      // Check if document exists
-      const existingDoc = await parts.findOne(searchKey);
-      if (!existingDoc) {
-        res.status(404).send('Document not found');
-        return;
-      }
-
       // Convert XML request body to JSON
       const xml = req.body;
       const options = { compact: true, ignoreComment: true, spaces: 4 };
