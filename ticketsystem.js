@@ -268,11 +268,13 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
   run().catch(console.dir);
 });
 
-// Endpoint to add a single ticket that was sent as an XML document
 app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
   const searchKey = { _id: new ObjectId(req.params.theId) };
   console.log("Updating: " + searchKey);
+
+  // Log the XML request body
+  console.log("Request body:", req.body);
 
   // Convert the XML request body to a JSON object
   const parser = new xml2js.Parser({explicitArray: false});
