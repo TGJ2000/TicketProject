@@ -269,7 +269,7 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
 });
 
 //Endpoint to update a ticket using XML
-app.put('/rest/ticket/:theId', function(req, res) {
+app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
   const searchKey = { _id: new ObjectId(req.params.theId) };
   console.log("Updating: " + searchKey);
