@@ -269,6 +269,8 @@ app.get('/rest/xml/ticket/:theId', function(req, res) {
 });
 
 //Endpoint to update a ticket using XML
+const convert = require('xml-js');
+
 app.put('/rest/xml/ticket/:theId', function(req, res) {
   const client = new MongoClient(uri);
   const searchKey = { _id: new ObjectId(req.params.theId) };
@@ -281,8 +283,8 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
 
       // Convert XML request body to JSON
       const xml = req.body;
-      const parser = new xml2js.Parser({ explicitArray: false });
-      const json = await parser.parseStringPromise(xml);
+      const options = { compact: true, ignoreComment: true, spaces: 4 };
+      const json = convert.xml2js(xml, options);
 
       // Extract the fields to update from the parsed JSON
       const {
@@ -295,19 +297,19 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
         recipient,
         submitter,
         assignee_id,
-      } = json;
+      } = json.root;
 
       // Set the fields to update
       const updateFields = {};
-      if (updated_at) updateFields.updated_at = updated_at;
-      if (type) updateFields.type = type;
-      if (subject) updateFields.subject = subject;
-      if (description) updateFields.description = description;
-      if (priority) updateFields.priority = priority;
-      if (status) updateFields.status = status;
-      if (recipient) updateFields.recipient = recipient;
-      if (submitter) updateFields.submitter = submitter;
-      if (assignee_id) updateFields.assignee_id = assignee_id;
+      if (updated_at) updateFields.updated_at = updated_at._text;
+      if (type) updateFields.type = type._text;
+      if (subject) updateFields.subject = subject._text;
+      if (description) updateFields.description = description._text;
+      if (priority) updateFields.priority = priority._text;
+      if (status) updateFields.status = status._text;
+      if (recipient) updateFields.recipient = recipient._text;
+      if (submitter) updateFields.submitter = submitter._text;
+      if (assignee_id) updateFields.assignee_id = assignee_id._text;
 
       // Update the document with the specified fields
       const result = await parts.updateOne(searchKey, { $set: updateFields });
@@ -323,3 +325,4 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   }
   run().catch(console.dir);
 });
+
