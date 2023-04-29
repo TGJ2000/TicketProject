@@ -21,27 +21,6 @@ console.log('Server started at http://localhost:' + port);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//Middleware to parse JSON and XML
-app.use(function(req, res, next) {
-  if (req.is('application/xml')) {
-    let xml = '';
-    req.on('data', chunk => {
-      xml += chunk;
-    });
-    req.on('end', () => {
-      xml2js.parseString(xml, (err, result) => {
-        if (err) {
-          throw err;
-        }
-        req.body = result;
-        next();
-      });
-    });
-  } else {
-    next();
-  }
-});
-
 // routes will go here
 
 // Default route:
@@ -348,49 +327,58 @@ app.put('/rest/xml/ticket/:theId', function(req, res) {
   run().catch(console.dir);
 });
 
-// Update a single ticket that was sent as an XML document
+
+// Update a ticket in the database from an XML document
 app.put('/rest/xml/ticket/:theId', function(req, res) {
 const client = new MongoClient(uri);
 const searchKey = { _id: new ObjectId(req.params.theId) };
 console.log("Updating: " + searchKey);
 
-async function run() {
-try {
-const database = client.db('Cluster0');
-const parts = database.collection('MyDB');
-  
-  // Parse the XML request body into a JSON object
-  const {
-    updated_at,
-    type,
-    subject,
-    description,
-    priority,
-    status,
-    recipient,
-    submitter,
-    assignee_id,
-  } = req.body.ticket;
-  const jsonBody = {
-    updated_at,
-    type,
-    subject,
-    description,
-    priority,
-    status,
-    recipient,
-    submitter,
-    assignee_id,
-  };
-
-  // Update the ticket with the specified fields
-  const result = await parts.updateOne(searchKey, { $set: jsonBody });
-  console.log(result);
-  res.send('Updated ' + result.modifiedCount + ' document(s)');
-
-} finally {
-  await client.close();
+let xml = '';
+req.on('data', chunk => {
+xml += chunk;
+});
+req.on('end', () => {
+xml2js.parseString(xml, async (err, result) => {
+if (err) {
+throw err;
 }
-}
-run().catch(console.dir);
+const data = result.ticket;
+
+  try {
+    const database = client.db('Cluster0');
+    const tickets = database.collection('tickets');
+
+    const {
+      updated_at,
+      type,
+      subject,
+      description,
+      priority,
+      status,
+      recipient,
+      submitter,
+      assignee_id,
+    } = data;
+
+    const updateFields = {};
+    if (updated_at) updateFields.updated_at = updated_at;
+    if (type) updateFields.type = type;
+    if (subject) updateFields.subject = subject;
+    if (description) updateFields.description = description;
+    if (priority) updateFields.priority = priority;
+    if (status) updateFields.status = status;
+    if (recipient) updateFields.recipient = recipient;
+    if (submitter) updateFields.submitter = submitter;
+    if (assignee_id) updateFields.assignee_id = assignee_id;
+
+    const result = await tickets.updateOne(searchKey, { $set: updateFields });
+    console.log(result);
+    res.send('Updated ' + result.modifiedCount + ' document(s)');
+
+  } finally {
+    await client.close();
+  }
+});
+});
 });
